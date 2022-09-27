@@ -1,0 +1,36 @@
+#!/bin/bash
+
+mkdir ~/Sites/tmp
+
+cd ~/Downloads
+echo "Moving $(find . -name "*.webm" | wc -l) webm files to webm/ dir..."
+mv *.webm webm
+echo "Moving all mp4 files to the mp4 dir"
+mv *.mp4 mp4
+
+
+echo "Importing $(find . -name "*.{jpg,jpeg,png}" | wc -l) files to the sorting machine..."
+sudo mv *.{jpg,jpeg,png} ~/Sites/tmp
+cd ~/Sites/tmp
+
+echo "Removing duplicates..."
+python2 ~/.yeji/bin/dupinator.py .
+
+echo "Fixing file permissions..."
+find . -type d -print0 | while read -d $'\0' file
+do
+	sudo chmod 777 "$file"
+done
+
+find . -type f -print0 | while read -d $'\0' file
+do
+	sudo chmod 666 "$file"
+done
+
+mv * ../szambo
+cd ..
+rm -rf tmp
+cd szambo
+python2 ~/.yeji/bin/dupinator.py .
+
+echo "Done"
